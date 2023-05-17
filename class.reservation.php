@@ -164,7 +164,7 @@ class ReservationPlugin {
                 </div>
         
                 <label for="reservation_date">Datum:</label>
-                <input type="text" id="reservation_date" name="reservation_date" required>
+                <input type="text" id="reservation_date" name="reservation_date" autocomplete="off" required>
                         
                 <label for="special_request_text">Overige opmerkingen (zoals allergieën):</label>
                 <textarea id="special_request_text" name="special_request_text"></textarea>
