@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.1
+Version: 1.2
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
@@ -14,7 +14,7 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-define('LRESERVATION_VERSION', '1.1');
+define('LRESERVATION_VERSION', '1.2');
 define('LRESERVATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 require_once(LRESERVATION_PLUGIN_DIR . 'class.reservation.php');
@@ -75,14 +75,26 @@ function handle_reservation_acceptance() {
             
             // Remove the reservation from the database
             $wpdb->delete($table_name, array('encrypted_id' => $reservation_id));
-
             // Redirect to a thank you page
-            wp_redirect(home_url('/reservering_geaccepteerd/'));
+            wp_redirect(home_url('/reservering_geaccepteerd/?success=true'));
             exit;
         }
+        // Redirect to a thank you page
+        wp_redirect(home_url('/reservering_geaccepteerd/?success=false'));
+        exit;
     }
 }
 add_action('init', 'handle_reservation_acceptance');
+
+// Add a shortcode to show the succes to reservering_geaccepteerd page
+function reservation_success_shortcode() {
+    if (!empty($_GET['success']) && $_GET['success'] == 'true') {
+        return '<p class="reservation-success">De reservering is bevestigd en de klant is ingelicht! Je hoeft verder niets te doen.</p>';
+    } else {
+        return '<p class="reservation-success failure">Er is iets mis gegaan met de reservering. Je kunt het beste de klant zelf even inlichten.</p>';
+    }
+}
+add_shortcode('reservation_success', 'reservation_success_shortcode');
 
 // Instantiate the class and set up WordPress actions/filters
 ReservationPlugin::init();
