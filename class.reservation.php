@@ -20,6 +20,7 @@ class ReservationPlugin {
         $reservation_time_lunch = sanitize_text_field($_POST['reservation_time_lunch']);
         $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
         $reservation_date = sanitize_text_field($_POST['reservation_date']);
+
         // reformat date to DD-MM-YYYY
         $reservation_date = date("d-m-Y", strtotime($reservation_date));
 
@@ -33,7 +34,7 @@ class ReservationPlugin {
         $wpdb->insert(
             $table_name,
             array(
-                'id' => $reservation_id,
+                'encrypted_id' => $reservation_id,
                 'email' => $reservation_email,
             ),
             array(

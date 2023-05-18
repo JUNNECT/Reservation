@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.0
+Version: 1.1
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
@@ -14,21 +14,21 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-define('LRESERVATION_VERSION', '1.0');
+define('LRESERVATION_VERSION', '1.1');
 define('LRESERVATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 require_once(LRESERVATION_PLUGIN_DIR . 'class.reservation.php');
 
-register_activation_hook(__FILE__, 'lente_reservation_install');
+register_activation_hook(__FILE__, 'reservation_install');
 
-function lente_reservation_style() {
-    wp_enqueue_style('lente_reservation_style', plugins_url('style.css', __FILE__));
+function reservation_style() {
+    wp_enqueue_style('reservation_style', plugins_url('style.css', __FILE__));
 }
-add_action('wp_enqueue_scripts', 'lente_reservation_style');
+add_action('wp_enqueue_scripts', 'reservation_style');
 
-function lente_reservation_install() {
+function reservation_install() {
     global $wpdb;
-    global $lente_reservation_db_version;
+    global $reservation_db_version;
 
     $table_name = $wpdb->prefix . 'reservations';
     
@@ -36,6 +36,7 @@ function lente_reservation_install() {
 
     $sql = "CREATE TABLE $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
+        encrypted_id varchar(55) NOT NULL,
         email varchar(55) NOT NULL,
         date varchar(55) NOT NULL,
         PRIMARY KEY  (id)
@@ -44,7 +45,7 @@ function lente_reservation_install() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 
-    add_option('lente_reservation_db_version', $lente_reservation_db_version);
+    add_option('reservation_db_version', $reservation_db_version);
 }
 
 function handle_reservation_acceptance() {
@@ -57,8 +58,9 @@ function handle_reservation_acceptance() {
         global $wpdb;
         $table_name = $wpdb->prefix . 'reservations';
 
-        $reservation_email = $wpdb->get_var($wpdb->prepare("SELECT email FROM $table_name WHERE id = %s", $reservation_id));
+        $reservation_email = $wpdb->get_var($wpdb->prepare("SELECT email FROM $table_name WHERE encrypted_id = %s", $reservation_id));
 
+        echo '<script type="text/javascript">alert("'.$reservation_email.'");</script>';
         echo '<script type="text/javascript">alert("'.$reservation_id.'");</script>';
 
         // Check if the reservation exists
@@ -71,6 +73,9 @@ function handle_reservation_acceptance() {
 
             wp_mail($to, $subject, $message, $headers);
             
+            // Remove the reservation from the database
+            $wpdb->delete($table_name, array('encrypted_id' => $reservation_id));
+
             // Redirect to a thank you page
             wp_redirect(home_url('/reservering_geaccepteerd/'));
             exit;
