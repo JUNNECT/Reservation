@@ -49,8 +49,15 @@ class ReservationPlugin {
             'reservation_accept' => $reservation_id,
         ), home_url('/'));
 
+        $reservation_restaurant_email = get_option('reservation_email');
+        
+        // Check if the reservation holder has entered an email address and if not, use the default admin email address
+        if($reservation_restaurant_email == '') {
+            $reservation_restaurant_email = get_option('admin_email');
+        }
+
         // Send email to restaurant owner
-        $to = "levi@junnect.nl";
+        $to = $reservation_restaurant_email;
         $subject = "Nieuwe reservering bij Eetboetiek Festina Lente";
         // Construct the email message
         $message = "Reservering details: \n\n<bR>";

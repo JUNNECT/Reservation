@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.2
+Version: 1.3
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
@@ -14,7 +14,7 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-define('LRESERVATION_VERSION', '1.2');
+define('LRESERVATION_VERSION', '1.3');
 define('LRESERVATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 require_once(LRESERVATION_PLUGIN_DIR . 'class.reservation.php');
@@ -46,6 +46,9 @@ function reservation_install() {
     dbDelta($sql);
 
     add_option('reservation_db_version', $reservation_db_version);
+
+    $admin_email = get_option('admin_email');
+    add_option('reservation_options', $admin_email);
 }
 
 function handle_reservation_acceptance() {
@@ -95,6 +98,44 @@ function reservation_success_shortcode() {
     }
 }
 add_shortcode('reservation_success', 'reservation_success_shortcode');
+
+// Register the "reservation_options" option
+function register_reservation_options() {
+    register_setting('reservation_options', 'reservation_email');
+}
+add_action('admin_init', 'register_reservation_options');
+
+// Add an admin menu for the plugin options page where the user can input the email address of the restaurant
+function reservation_menu() {
+    add_options_page('Reservering', 'Reservering', 'manage_options', 'reservation', 'reservation_options');
+}
+add_action('admin_menu', 'reservation_menu');
+
+// Add the options page to the admin menu and display the form fields for the restaurant email address
+function reservation_options() {
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have sufficient permissions to access this page.'));
+    }
+
+    $email = get_option('reservation_email');
+    ?>
+    <div class="wrap">
+        <h1>Reservering</h1>
+        <form method="post" action="options.php">
+            <?php settings_fields('reservation_options'); ?>
+            <?php do_settings_sections('reservation_options'); ?>
+            <table class="form-table">
+                <tr valign="top">
+                    <th scope="row">Emailadres</th>
+                    <td><input type="text" name="reservation_email" value="<?php echo esc_attr($email); ?>" /></td>
+                </tr>
+            </table>
+            <?php submit_button(); ?>
+        </form>
+    </div>
+    <?php
+}
+
 
 // Instantiate the class and set up WordPress actions/filters
 ReservationPlugin::init();
