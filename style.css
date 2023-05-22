@@ -65,6 +65,11 @@
     background: #ccc;
 }
 
+.reservation_type_more_than_10 {
+    display: none;
+    margin-top: 20px;
+}
+
 .square-radios input[type="radio"] {
     display: none; /* Hide the radio buttons */
 }
