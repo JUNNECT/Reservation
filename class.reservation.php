@@ -60,16 +60,19 @@ class ReservationPlugin {
         $to = $reservation_restaurant_email;
         $subject = "Nieuwe reservering bij Eetboetiek Festina Lente";
         // Construct the email message
-        $message = "Reservering details: \n\n<bR>";
+        $message = "<b>Reservering details: </b>\n\n<bR>";
         $message .= "Reservering houder: $reservation_holder_voornaam $reservation_holder_achternaam\n<bR>";
         $message .= "E-mail: $reservation_email\n<bR>";
-        $message .= "Telefoonnummer: $reservation_phone\n<bR>";
+        $message .= "Telefoonnummer: $reservation_phone\n<bR><br>";
         $message .= "Aantal gasten: $reservation_guests\n<bR>";
         $message .= "Reservering type: $reservation_type\n<bR>";
-        $message .= "Reservering tijd (bij Lunch): $reservation_time_lunch\n<bR>";
-        $message .= "Reservering tijd (bij High Tea): $reservation_time_high_tea\n<bR>";
+        if($reservation_type == 'Lunch' || $reservation_type == 'Lente\'s Lunch') {
+            $message .= "Reservering tijd (Lunch): $reservation_time_lunch\n<bR>";
+        } else if($reservation_type == 'High Tea') {
+            $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
+        }
         $message .= "Reservering datum: $reservation_date\n<bR>";
-        $message .= "Opmerkingen: $special_request_text\n\n<bR><bR>";
+        $message .= "Opmerkingen: $special_request_text\n\n<bR><bR><br>";
         $message .= "Klik op de volgende link om de reservering te accepteren: <a href='$accept_reservation_link'>Reservering bevestigen</a>";
 
         $headers = array('Content-Type: text/html; charset=UTF-8');
@@ -82,11 +85,14 @@ class ReservationPlugin {
         $message .= "Je reservering details: \n\n<bR>";
         $message .= "Reservering houder: $reservation_holder_voornaam $reservation_holder_achternaam\n<bR>";
         $message .= "E-mail: $reservation_email\n<bR>";
-        $message .= "Telefoonnummer: $reservation_phone\n<bR>";
+        $message .= "Telefoonnummer: $reservation_phone\n<bR><bR>";
         $message .= "Aantal gasten: $reservation_guests\n<bR>";
         $message .= "Reservering type: $reservation_type\n<bR>";
-        $message .= "Reservering tijd (bij Lunch): $reservation_time_lunch\n<bR>";
-        $message .= "Reservering tijd (bij High Tea): $reservation_time_high_tea\n<bR>";
+        if($reservation_type == 'Lunch' || $reservation_type == 'Lente\'s Lunch') {
+            $message .= "Reservering tijd (Lunch): $reservation_time_lunch\n<bR>";
+        } else if($reservation_type == 'High Tea') {
+            $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
+        }
         $message .= "Reservering datum: $reservation_date\n<bR>";
         $message .= "Opmerkingen: $special_request_text\n\n<bR><bR>";
         $headers = array('Content-Type: text/html; charset=UTF-8');
@@ -184,49 +190,6 @@ class ReservationPlugin {
                 <a class="form_button" href="tel:0165–857253">Direct bellen</a>
             </div>
         </form>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-        <script>
-        jQuery(document).ready(function() {
-            $('#reservation_date').datepicker({
-                minDate: 1, // Disable past dates and today
-                beforeShowDay: function(date) {
-                    return [date.getDay() != 0, '']; // Disable Sundays (day 0)
-                }
-            });
-
-            // Show/hide rest of form based on guests (more then 10, hide, any of the others, show)
-            $('#guests_more').change(function() {
-                if($(this).is(':checked')) {
-                    $('.rest_of_form').hide();
-                    $('.reservation_type_more_than_10').show();
-                }
-            });
-
-            $('#guests_1, #guests_2, #guests_3, #guests_4, #guests_5, #guests_6, #guests_7, #guests_8, #guests_9, #guests_10').change(function() {
-                if($(this).is(':checked')) {
-                    $('.rest_of_form').show();
-                    $('.reservation_type_more_than_10').hide();
-                }
-            });
-
-            $('#reservation_type').change(function() {
-                if($(this).val() == 'Lunch' || $(this).val() == 'Lente\'s Lunch') {
-                    $('.reservation_time_lunch').show();
-                    $('.reservation_time_high_tea').hide();
-                } else if($(this).val() == 'High Tea') {
-                    $('.reservation_time_lunch').hide();
-                    $('.reservation_time_high_tea').show();
-                } else {
-                    $('.reservation_time_lunch').hide();
-                    $('.reservation_time_high_tea').hide();
-                }
-            });
-
-        });
-        </script>
 
         <?php
         return ob_get_clean();

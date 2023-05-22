@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.3
+Version: 1.4
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
@@ -14,7 +14,7 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-define('LRESERVATION_VERSION', '1.3');
+define('LRESERVATION_VERSION', '1.4');
 define('LRESERVATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 require_once(LRESERVATION_PLUGIN_DIR . 'class.reservation.php');
@@ -25,6 +25,19 @@ function reservation_style() {
     wp_enqueue_style('reservation_style', plugins_url('style.css', __FILE__));
 }
 add_action('wp_enqueue_scripts', 'reservation_style');
+
+function reservation_scripts() {
+    // load in the datepicker script from external source
+    wp_enqueue_script( 'jquery-ui-datepicker' );
+
+    // You need styling for the datepicker. For simplicity I've linked to the jQuery UI CSS on a CDN.
+    wp_register_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
+    wp_enqueue_style( 'jquery-ui' );  
+
+    wp_enqueue_script('reservation_script', plugins_url('script.js', __FILE__), array('jquery'), '1.0.0', true);
+
+}
+add_action('wp_enqueue_scripts', 'reservation_scripts');
 
 function reservation_install() {
     global $wpdb;
