@@ -186,7 +186,7 @@ class ReservationPlugin {
                 <input type="submit" value="Reservering plaatsen">
             </div>
             <div class="reservation_type_more_than_10" style="display: none;">
-                <p>Gezellig dat je met zo'n grote groep wilt komen! We zouden je willen vragen om even telefonisch te reserveren via 0165 – 85 72 53 om je wensen te bespreken.</p>
+                <p class="reservation_more_p">Gezellig dat je met zo'n grote groep wilt komen! We zouden je willen vragen om even telefonisch te reserveren via 0165 – 85 72 53 om je wensen te bespreken.</p>
                 <a class="form_button" href="tel:0165–857253">Direct bellen</a>
             </div>
         </form>

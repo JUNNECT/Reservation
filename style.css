@@ -70,6 +70,10 @@
     margin-top: 20px;
 }
 
+.reservation_more_p {
+    margin-bottom: 25px;
+}
+
 .square-radios input[type="radio"] {
     display: none; /* Hide the radio buttons */
 }
