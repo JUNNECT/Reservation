@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.4.5
+Version: 1.4.6
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
@@ -14,7 +14,7 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-define('LRESERVATION_VERSION', '1.4.5');
+define('LRESERVATION_VERSION', '1.4.6');
 define('LRESERVATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 require_once(LRESERVATION_PLUGIN_DIR . 'class.reservation.php');
@@ -64,13 +64,6 @@ function reservation_install() {
     add_option('reservation_options', $admin_email);
 }
 
-function handle_reservation_error() {
-    if(isset($_GET['error']) && $_GET['error'] == 'empty_fields') {
-        echo '<p class="reservation-error">Vergeet niet alle velden in te vullen!</p>';
-    }
-}
-add_action('wp_footer', 'handle_reservation_error');
-
 function handle_reservation_acceptance() {
     // Check if the reservation_accept query parameter is present
     if (!empty($_GET['reservation_accept'])) {
@@ -98,10 +91,10 @@ function handle_reservation_acceptance() {
             // Redirect to a thank you page
             wp_redirect(home_url('/reservering_geaccepteerd/?success=true'));
             exit;
-        } else {
-            // wp_redirect(home_url('/reservering_geaccepteerd/?success=false'));
-            // exit;
         }
+        // Redirect to a thank you page
+        wp_redirect(home_url('/reservering_geaccepteerd/?success=false'));
+        exit;
     }
 }
 add_action('init', 'handle_reservation_acceptance');

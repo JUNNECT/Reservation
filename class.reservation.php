@@ -21,6 +21,9 @@ class ReservationPlugin {
         $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
         $reservation_date = sanitize_text_field($_POST['reservation_date']);
 
+        // reformat date to DD-MM-YYYY
+        // $reservation_date = date("d-m-Y", strtotime($reservation_date));
+
         $special_request_text = sanitize_text_field($_POST['special_request_text']);
         $reservation_id = self::generate_random_id();
 
@@ -40,6 +43,7 @@ class ReservationPlugin {
             )
         );
 
+        // TODO: Create reservation acceptance link
         // Create reservation acceptance link
         $accept_reservation_link = add_query_arg(array(
             'reservation_accept' => $reservation_id,
@@ -105,12 +109,12 @@ class ReservationPlugin {
     
     public static function render_reservation_form() {
         ob_start();
+
         ?>
         <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" id="reservation_form">
             <input type="hidden" name="action" value="submit_reservation">
             <?php wp_nonce_field('reservation_verify'); ?>
             
-            <!-- Your form fields here. For example: -->
             <div class="two-columns-form-row">
                 <div class="two-columns-form-column">
                     <label for="reservation_holder_voornaam">Voornaam:</label>
@@ -141,7 +145,7 @@ class ReservationPlugin {
             <div class="rest_of_form">
 
                 <label for="reservation_type">Waarvoor wil je reserveren:</label>
-                <select id="reservation_type" name="reservation_type">
+                <select id="reservation_type" name="reservation_type" required>
                     <option value="none" selected disabled hidden>Selecteer een optie</option>
                     <option value="Lunch">Lunch</option>
                     <option value="High Tea">High Tea</option>
@@ -151,7 +155,7 @@ class ReservationPlugin {
                 <div class="reservation_time_lunch" style="display: none;">
                     <label for="reservation_time_lunch">Tijd:</label>
                     <select id="reservation_time_lunch" name="reservation_time_lunch" required>
-                        <option value="none" selected disabled hidden>Selecteer een optie</option>
+                        <option id="lunch_none" value="" selected disabled hidden>Selecteer een optie</option>
                         <?php
                             $start = new DateTime("09:30");
                             $end = new DateTime("16:00");
@@ -167,7 +171,7 @@ class ReservationPlugin {
                 <div class="reservation_time_high_tea" style="display: none;">
                     <label for="reservation_time_high_tea">Tijd:</label>
                     <select id="reservation_time_high_tea" name="reservation_time_high_tea" required>
-                        <option value="none" selected disabled hidden>Selecteer een optie</option>
+                        <option id="high_tea_none" value="" selected disabled hidden>Selecteer een optie</option>
                         <option value="10:00-12:00">10:00 - 12:00</option>
                         <option value="14:30-17:00">14:30 - 17:00</option>
                     </select>

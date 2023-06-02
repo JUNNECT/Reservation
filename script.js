@@ -27,24 +27,17 @@ jQuery(document).ready(function() {
         if($(this).val() == 'Lunch' || $(this).val() == 'Lente\'s Lunch') {
             $('.reservation_time_lunch').show();
             $('.reservation_time_high_tea').hide();
+            $('#high_tea_none').attr('value', 'none');
+            $('#lunch_none').attr('value', '');
         } else if($(this).val() == 'High Tea') {
             $('.reservation_time_lunch').hide();
             $('.reservation_time_high_tea').show();
+            $('#lunch_none').attr('value', 'none');
+            $('#high_tea_none').attr('value', '');
         } else {
             $('.reservation_time_lunch').hide();
             $('.reservation_time_high_tea').hide();
         }
     });
-
-    $('#reservation_form').submit(function(event) {
-        var selectedLunchTime = $('#reservation_time_lunch').val();
-        var selectedHighTeaTime = $('#reservation_time_high_tea').val();
-  
-        // Check if either lunch or high tea time is selected
-        if (selectedLunchTime === 'none' && selectedHighTeaTime === 'none') {
-          event.preventDefault(); // Prevent form submission
-          alert('Selecteer een tijd.');
-        }
-      });
 
 });
