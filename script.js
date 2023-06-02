@@ -1,4 +1,6 @@
 jQuery(document).ready(function() {
+    $ = jQuery;
+
     $('#reservation_date').datepicker({
         minDate: 1, // Disable past dates and today
         beforeShowDay: function(date) {
@@ -33,5 +35,16 @@ jQuery(document).ready(function() {
             $('.reservation_time_high_tea').hide();
         }
     });
+
+    $('#reservation_form').submit(function(event) {
+        var selectedLunchTime = $('#reservation_time_lunch').val();
+        var selectedHighTeaTime = $('#reservation_time_high_tea').val();
+  
+        // Check if either lunch or high tea time is selected
+        if (selectedLunchTime === 'none' && selectedHighTeaTime === 'none') {
+          event.preventDefault(); // Prevent form submission
+          alert('Selecteer een tijd.');
+        }
+      });
 
 });

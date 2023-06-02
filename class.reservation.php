@@ -21,9 +21,6 @@ class ReservationPlugin {
         $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
         $reservation_date = sanitize_text_field($_POST['reservation_date']);
 
-        // reformat date to DD-MM-YYYY
-        $reservation_date = date("d-m-Y", strtotime($reservation_date));
-
         $special_request_text = sanitize_text_field($_POST['special_request_text']);
         $reservation_id = self::generate_random_id();
 
@@ -43,7 +40,6 @@ class ReservationPlugin {
             )
         );
 
-        // TODO: Create reservation acceptance link
         // Create reservation acceptance link
         $accept_reservation_link = add_query_arg(array(
             'reservation_accept' => $reservation_id,
@@ -134,12 +130,12 @@ class ReservationPlugin {
 
             <label for="reservation_guests">Aantal gasten:</label>
             <div class="square-radios">
-                <?php for ($i = 1; $i <= 10; $i++): ?>
+                <?php for ($i = 1; $i <= 8; $i++): ?>
                 <input type="radio" id="guests_<?php echo $i; ?>" name="guests" value="<?php echo $i; ?>">
                 <label for="guests_<?php echo $i; ?>"><?php echo $i; ?></label>
                 <?php endfor; ?>
                 <input type="radio" id="guests_more" name="guests" value="more">
-                <label for="guests_more">>10</label>
+                <label for="guests_more">>8</label>
             </div>
 
             <div class="rest_of_form">
