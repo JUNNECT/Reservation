@@ -24,12 +24,12 @@ jQuery(document).ready(function() {
     });
 
     $('#reservation_type').change(function() {
-        if($(this).val() == 'Lunch' || $(this).val() == 'Lente\'s Lunch') {
+        if($(this).val() == 'lunch' || $(this).val() == 'lente_lunch') {
             $('.reservation_time_lunch').show();
             $('.reservation_time_high_tea').hide();
             $('#high_tea_none').attr('value', 'none');
             $('#lunch_none').attr('value', '');
-        } else if($(this).val() == 'High Tea') {
+        } else if($(this).val() == 'high_tea') {
             $('.reservation_time_lunch').hide();
             $('.reservation_time_high_tea').show();
             $('#lunch_none').attr('value', 'none');
