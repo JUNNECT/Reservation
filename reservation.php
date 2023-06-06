@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.4.8
+Version: 1.4.9
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
@@ -14,12 +14,24 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-define('LRESERVATION_VERSION', '1.4.8');
+define('LRESERVATION_VERSION', '1.4.9');
 define('LRESERVATION_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 require_once(LRESERVATION_PLUGIN_DIR . 'class.reservation.php');
 
 register_activation_hook(__FILE__, 'reservation_install');
+
+require 'plugin-update-checker/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+    'https://github.com/JUNNECT/Reservation',
+	__FILE__,
+	'reservation'
+);
+
+//Set the branch that contains the stable release.
+$myUpdateChecker->setBranch('main');
 
 function reservation_style() {
     wp_enqueue_style('reservation_style', plugins_url('style.css', __FILE__));
