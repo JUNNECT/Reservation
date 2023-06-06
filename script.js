@@ -39,14 +39,16 @@ jQuery(document).ready(function() {
         }
     });
 
-    jQuery(document).ready(function($) {
-        $('#reservation_form').on('submit', function(e) {
-      
-          // Display the loading animation
-          $('#loading_animation').css('display', 'flex');
-      
-        });
-      });
-      
+    $('#reservation_form').on('submit', function(e) {
 
+        // Prevent the form from submitting
+        e.preventDefault();
+
+        // Display the loading animation
+        $('#loading-spinner').css('display', 'flex');
+
+        this.submit();
+
+    });
+      
 });
