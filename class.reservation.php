@@ -43,7 +43,6 @@ class ReservationPlugin {
             )
         );
 
-        // TODO: Create reservation acceptance link
         // Create reservation acceptance link
         $accept_reservation_link = add_query_arg(array(
             'reservation_accept' => $reservation_id,
@@ -197,7 +196,13 @@ class ReservationPlugin {
                 <label for="special_request_text">Overige opmerkingen (zoals allergieën):</label>
                 <textarea id="special_request_text" name="special_request_text"></textarea>
 
-                <input type="submit" value="Reservering plaatsen">
+                <div class="submit-div">
+                    <input type="submit" value="Reservering plaatsen">
+                    <div id="loading-spinner" style="display:none; align-items: center;">
+                        <img width="64px" src="<?php echo plugin_dir_url(__FILE__).'spinner.svg'; ?>" style="vertical-align: middle;" alt="Loading spinner">
+                        <p style="display:inline; color: #333!important; font-size: 16px">Versturen...</p>
+                    </div>
+                </div>
             </div>
             <div class="reservation_type_more_than_10" style="display: none;">
                 <p class="reservation_more_p">Gezellig dat je met zo'n grote groep wilt komen! We zouden je willen vragen om even telefonisch te reserveren via 0165 – 85 72 53 om je wensen te bespreken.</p>

@@ -2,13 +2,12 @@ jQuery(document).ready(function() {
     $ = jQuery;
 
     $('#reservation_date').datepicker({
-        minDate: 1, // Disable past dates and today
+        minDate: 1, 
         beforeShowDay: function(date) {
-            return [date.getDay() != 0, '']; // Disable Sundays (day 0)
+            return [date.getDay() != 0, '']; 
         }
     });
 
-    // Show/hide rest of form based on guests (more then 10, hide, any of the others, show)
     $('#guests_more').change(function() {
         if($(this).is(':checked')) {
             $('.rest_of_form').hide();
@@ -39,5 +38,15 @@ jQuery(document).ready(function() {
             $('.reservation_time_high_tea').hide();
         }
     });
+
+    jQuery(document).ready(function($) {
+        $('#reservation_form').on('submit', function(e) {
+      
+          // Display the loading animation
+          $('#loading_animation').css('display', 'flex');
+      
+        });
+      });
+      
 
 });

@@ -30,10 +30,11 @@ function reservation_scripts() {
     // load in the datepicker script from external source
     wp_enqueue_script( 'jquery-ui-datepicker' );
 
-    // You need styling for the datepicker. For simplicity I've linked to the jQuery UI CSS on a CDN.
+    // load in the datepicker style from external source
     wp_register_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
     wp_enqueue_style( 'jquery-ui' );  
 
+    // load in the script.js file
     wp_enqueue_script('reservation_script', plugins_url('script.js', __FILE__), array('jquery'), '1.0.0', true);
 
 }
