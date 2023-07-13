@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.6
+Version: 1.7
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
