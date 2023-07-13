@@ -167,7 +167,7 @@ class ReservationPlugin {
 
                 <div class="reservation_time_lunch" style="display: none;">
                     <label for="reservation_time_lunch">Tijd:</label>
-                    <select id="reservation_time_lunch" name="reservation_time_lunch" required>
+                    <select id="reservation_time_lunch" name="reservation_time_lunch">
                         <option id="lunch_none" value="" selected disabled hidden>Selecteer een optie</option>
                         <?php
                             $start = new DateTime("09:30");
@@ -183,7 +183,7 @@ class ReservationPlugin {
 
                 <div class="reservation_time_high_tea" style="display: none;">
                     <label for="reservation_time_high_tea">Tijd:</label>
-                    <select id="reservation_time_high_tea" name="reservation_time_high_tea" required>
+                    <select id="reservation_time_high_tea" name="reservation_time_high_tea">
                         <option id="high_tea_none" value="" selected disabled hidden>Selecteer een optie</option>
                         <option value="10:00-12:00">10:00 - 12:00</option>
                         <option value="14:30-17:00">14:30 - 17:00</option>

@@ -26,11 +26,16 @@ jQuery(document).ready(function() {
         if($(this).val() == 'lunch' || $(this).val() == 'lente_lunch') {
             $('.reservation_time_lunch').show();
             $('.reservation_time_high_tea').hide();
+            // add required to lunch time select
+            $('.reservation_time_lunch select').attr('required', 'required');
+
             $('#high_tea_none').attr('value', 'none');
             $('#lunch_none').attr('value', '');
         } else if($(this).val() == 'high_tea') {
             $('.reservation_time_lunch').hide();
             $('.reservation_time_high_tea').show();
+            // add required to high tea time select
+            $('.reservation_time_high_tea select').attr('required', 'required');
             $('#lunch_none').attr('value', 'none');
             $('#high_tea_none').attr('value', '');
         } else {
