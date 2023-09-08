@@ -3,7 +3,7 @@
 Plugin Name: Reservatie
 Plugin URI: https://junnect.nl
 Description: A simple reservation plugin 
-Version: 1.7
+Version: 1.8
 Author: JUNNECT
 Author URI: https://junnect.nl
 */
@@ -116,6 +116,8 @@ add_action('init', 'handle_reservation_acceptance');
 function reservation_success_shortcode() {
     if (!empty($_GET['success']) && $_GET['success'] == 'true') {
         return '<p class="reservation-success">De reservering is bevestigd en de klant is ingelicht! Je hoeft verder niets te doen.</p>';
+    } elseif(!empty($_GET['success']) && $_GET['success'] == 'recaptcha') {
+        return '<p class="reservation-success failure">Er is iets mis gegaan met de reservering. Probeer het nog een keer.</p>';
     } else {
         return '<p class="reservation-success failure">Er is iets mis gegaan met de reservering. Je kunt het beste de klant zelf even inlichten.</p>';
     }

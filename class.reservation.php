@@ -10,6 +10,31 @@ class ReservationPlugin {
         // Check nonce for security
         check_admin_referer('reservation_verify');
 
+        // Verify reCAPTCHA
+        $recaptcha_secret = '6LfdbZ4nAAAAAGYaIp7ma6D4HRYYW88R_fcd97k2';
+        $recaptcha_response = sanitize_text_field($_POST['g-recaptcha-response']);
+
+        $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(
+            'body' => array(
+                'secret' => $recaptcha_secret,
+                'response' => $recaptcha_response,
+            )
+        ));
+
+        $response_keys = json_decode(wp_remote_retrieve_body($response), true);
+
+        if (intval($response_keys["success"]) !== 1) {
+            // reCAPTCHA verification failed
+            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha'));
+            exit;
+        }
+
+        if ($response_keys["score"] < 0.5) {
+            // reCAPTCHA v3 detected suspicious interaction
+            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha'));
+            exit;
+        }
+
         // Process form data and send email
         $reservation_holder_voornaam = sanitize_text_field($_POST['reservation_holder_voornaam']);
         $reservation_holder_achternaam = sanitize_text_field($_POST['reservation_holder_achternaam']);
@@ -70,6 +95,9 @@ class ReservationPlugin {
             $message .= "Reservring type: High Tea\n<bR>";
         } else if($reservation_type == 'lente_lunch') {
             $message .= "Reservring type: Lente's Lunch\n<bR>";
+        } else {
+            $reservering_type = 'lentes_menu';
+            $message.= "Reservering type: Lente's Menu\n<bR>";
         }
 
         if($reservation_type == 'lunch' || $reservation_type == 'lente_lunch') {
@@ -121,9 +149,34 @@ class ReservationPlugin {
     }
     
     public static function render_reservation_form() {
+        // Merge user provided attributes with known attributes and fill in defaults when needed
+        $atts = shortcode_atts(
+            array(
+                'name' => 'default_name',
+                // add more attributes here as needed
+            ),
+            $atts,
+            'reservation_form' // The shortcode tag
+        );
+
+        $name = esc_attr($atts['name']);
+
         ob_start();
 
         ?>
+        <script src="https://www.google.com/recaptcha/api.js?render=6LfdbZ4nAAAAANeMVJP3zjWNuHiBJgc4IjwBcnoR"></script>
+        <script>
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6LfdbZ4nAAAAANeMVJP3zjWNuHiBJgc4IjwBcnoR', {action: 'submit'}).then(function(token) {
+                    var recaptchaInput = document.createElement('input');
+                    recaptchaInput.type = 'hidden';
+                    recaptchaInput.name = 'g-recaptcha-response';
+                    recaptchaInput.value = token;
+                    document.getElementById('reservation_form').appendChild(recaptchaInput);
+                });
+            });
+        </script>
+
         <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" id="reservation_form">
             <input type="hidden" name="action" value="submit_reservation">
             <?php wp_nonce_field('reservation_verify'); ?>
@@ -151,12 +204,12 @@ class ReservationPlugin {
                 <input type="radio" id="guests_<?php echo $i; ?>" name="guests" value="<?php echo $i; ?>">
                 <label for="guests_<?php echo $i; ?>"><?php echo $i; ?></label>
                 <?php endfor; ?>
-                <input type="radio" id="guests_more" name="guests" value="more">
+                <input type="radio" id="guests_more" name="guests" value="more" required>
                 <label for="guests_more">>8</label>
             </div>
 
             <div class="rest_of_form">
-
+                <?php if($name != 'lentes_menu') { ?>
                 <label for="reservation_type">Waarvoor wil je reserveren:</label>
                 <select id="reservation_type" name="reservation_type" required>
                     <option value="none" selected disabled hidden>Selecteer een optie</option>
@@ -189,9 +242,28 @@ class ReservationPlugin {
                         <option value="14:30-17:00">14:30 - 17:00</option>
                     </select>
                 </div>
-        
+                <?php } else { ?>
+
+                <div class="reservation_time_menu">
+                    <label for="reservation_time_menu">Tijd:</label>
+                    <select id="reservation_time_menu" name="reservation_time_menu">
+                        <option id="menu_none" value="" selected disabled hidden>Selecteer een optie</option>
+                        <?php
+                            $start = new DateTime("17:00");
+                            $end = new DateTime("19:00");
+                            $interval = DateInterval::createFromDateString('30 min');
+                            $times = new DatePeriod($start, $interval, $end);
+                            foreach ($times as $time) {
+                                echo '<option value="' . $time->format('H:i') . '">' . $time->format('H:i') . '</option>';
+                            }
+                        ?>
+                    </select>
+                </div>
+
+                <?php } ?>
+
                 <label for="reservation_date">Datum:</label>
-                <input type="text" id="reservation_date" name="reservation_date" autocomplete="off" required>
+                <input type="text" id="reservation_date<?php if($name == 'lentes_menu'): echo '_lunch'; endif; ?>" name="reservation_date" autocomplete="off" required>
                         
                 <label for="special_request_text">Overige opmerkingen (zoals allergieën):</label>
                 <textarea id="special_request_text" name="special_request_text"></textarea>
@@ -213,5 +285,4 @@ class ReservationPlugin {
         <?php
         return ob_get_clean();
     }
-    
 }

@@ -8,6 +8,13 @@ jQuery(document).ready(function() {
         }
     });
 
+    $('#reservation_date_menu').datepicker({
+        minDate: 1, 
+        beforeShowDay: function(date) {
+            return [(date.getDay() == 5), ''];
+        }
+    });
+
     $('#guests_more').change(function() {
         if($(this).is(':checked')) {
             $('.rest_of_form').hide();
