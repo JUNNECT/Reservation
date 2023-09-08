@@ -11,7 +11,7 @@ class ReservationPlugin {
         check_admin_referer('reservation_verify');
 
         // Verify reCAPTCHA
-        $recaptcha_secret = '6LfdbZ4nAAAAAGYaIp7ma6D4HRYYW88R_fcd97k2';
+        $recaptcha_secret = '';
         $recaptcha_response = sanitize_text_field($_POST['g-recaptcha-response']);
 
         $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(
