@@ -46,9 +46,19 @@ class ReservationPlugin {
         } else {
             $reservation_type = 'lentes_menu';
         }
-        $reservation_time_lunch = sanitize_text_field($_POST['reservation_time_lunch']);
-        $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
-        $reservation_time_menu = sanitize_text_field($_POST['reservation_time_menu']);
+
+        if(isset($_POST['reservation_time_lunch'])) {
+            $reservation_time_lunch = sanitize_text_field($_POST['reservation_time_lunch']);
+        }
+
+        if(isset($_POST['reservation_time_high_tea'])) {
+            $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
+        }
+
+        if(isset($_POST['reservation_time_menu'])) {
+            $reservation_time_menu = sanitize_text_field($_POST['reservation_time_menu']);
+        }
+
         $reservation_date = sanitize_text_field($_POST['reservation_date']);
 
         // reformat date to DD-MM-YYYY
