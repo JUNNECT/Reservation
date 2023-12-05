@@ -10,165 +10,159 @@ class ReservationPlugin {
         // Check nonce for security
         check_admin_referer('reservation_verify');
 
-        // Verify reCAPTCHA
-        // $recaptcha_secret = get_option('reservation_recaptche_secret');
-        // if(empty($recaptcha_secret)) {
-        //     // sent e-mail to support@junnect.nl, include site name
-        //     wp_mail('support@junnect.nl', 'Recaptcha secret not set', 'Recaptcha secret not set for site: ' . get_bloginfo('name'));
-        //     wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
-        //     exit;
-        // }
-        // $recaptcha_response = sanitize_text_field($_POST['g-recaptcha-response']);
-
-        // $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(
-        //     'body' => array(
-        //         'secret' => $recaptcha_secret,
-        //         'response' => $recaptcha_response,
-        //     )
-        // ));
-
-        // $response_keys = json_decode(wp_remote_retrieve_body($response), true);
-
-        // if (intval($response_keys["success"]) !== 1) {
-        //     // reCAPTCHA verification failed
-        //     wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
-        //     exit;
-        // }
-
-        // if ($response_keys["score"] < 0.5) {
-        //     // reCAPTCHA v3 detected suspicious interaction
-        //     wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=suspicious'));
-        //     exit;
-        // }
-
-        // Process form data and send email
-        $reservation_holder_voornaam = sanitize_text_field($_POST['reservation_holder_voornaam']);
-        $reservation_holder_achternaam = sanitize_text_field($_POST['reservation_holder_achternaam']);
-        $reservation_email = sanitize_email($_POST['reservation_email']);
-        $reservation_phone = sanitize_text_field($_POST['reservation_phone']);
-        $reservation_guests = sanitize_text_field($_POST['guests']);
-        if(isset($_POST['reservation_type'])) {
-            $reservation_type = sanitize_text_field($_POST['reservation_type']);
+        if (!isset($_POST['g-recaptcha-response'])) {
+            // Redirect to current page with error message
+            $query = 'error';
+            $query_val = 'recaptcha_not_sent';
+            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=recaptcha_not_sent'));
+            exit();
         } else {
-            $reservation_type = 'lentes_menu';
-        }
-
-        // if(isset($_POST['reservation_time_lunch'])) {
-            $reservation_time_lunch = sanitize_text_field($_POST['reservation_time_lunch']);
-        // }
-
-        // if(isset($_POST['reservation_time_high_tea'])) {
-            $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
-        // }
-
-        // if(isset($_POST['reservation_time_menu'])) {
-            $reservation_time_menu = sanitize_text_field($_POST['reservation_time_menu']);
-        // }
-
-        $reservation_date = sanitize_text_field($_POST['reservation_date']);
-
-        // reformat date to DD-MM-YYYY
-        // $reservation_date = date("d-m-Y", strtotime($reservation_date));
-
-        $special_request_text = sanitize_text_field($_POST['special_request_text']);
-        $reservation_id = self::generate_random_id();
-
-        // Store reservation data in the database
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'reservations';
-
-        $wpdb->insert(
-            $table_name,
-            array(
-                'encrypted_id' => $reservation_id,
-                'email' => $reservation_email,
-            ),
-            array(
-                '%s',  // The format of the id field
-                '%s',  // The format of the email field
-            )
-        );
-
-        // Create reservation acceptance link
-        $accept_reservation_link = add_query_arg(array(
-            'reservation_accept' => $reservation_id,
-        ), home_url('/'));
-
-        $reservation_restaurant_email = get_option('reservation_email');
         
-        // Check if the reservation holder has entered an email address and if not, use the default admin email address
-        if($reservation_restaurant_email == '') {
-            $reservation_restaurant_email = get_option('admin_email');
+            // Verify reCAPTCHA
+            $recaptcha_secret = get_option('reservation_recaptche_secret');
+            $recaptcha_response = sanitize_text_field($_POST['g-recaptcha-response']);
+            
+            $response = wp_remote_post('https://challenges.cloudflare.com/turnstile/v0/siteverify', array(
+                'body' => array(
+                    'secret' => $recaptcha_secret,
+                    'response' => $recaptcha_response,
+                )
+            ));
+            
+            $response_keys = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (intval($response_keys["success"]) !== 1) {
+                // Turnstile verification failed
+                $query = 'error';
+                $query_val = 'recaptcha_verify_failed';
+                wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=recaptcha_verify_failed'));
+                exit();
+            } else {
+
+                // Process form data and send email
+                $reservation_holder_voornaam = sanitize_text_field($_POST['reservation_holder_voornaam']);
+                $reservation_holder_achternaam = sanitize_text_field($_POST['reservation_holder_achternaam']);
+                $reservation_email = sanitize_email($_POST['reservation_email']);
+                $reservation_phone = sanitize_text_field($_POST['reservation_phone']);
+                $reservation_guests = sanitize_text_field($_POST['guests']);
+                if(isset($_POST['reservation_type'])) {
+                    $reservation_type = sanitize_text_field($_POST['reservation_type']);
+                } else {
+                    $reservation_type = 'lentes_menu';
+                }
+
+                $reservation_time_lunch = sanitize_text_field($_POST['reservation_time_lunch']);
+
+                $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
+
+                $reservation_time_menu = sanitize_text_field($_POST['reservation_time_menu']);
+
+                $reservation_date = sanitize_text_field($_POST['reservation_date']);
+
+                // reformat date to DD-MM-YYYY
+                // $reservation_date = date("d-m-Y", strtotime($reservation_date));
+
+                $special_request_text = sanitize_text_field($_POST['special_request_text']);
+                $reservation_id = self::generate_random_id();
+
+                // Store reservation data in the database
+                global $wpdb;
+                $table_name = $wpdb->prefix . 'reservations';
+
+                $wpdb->insert(
+                    $table_name,
+                    array(
+                        'encrypted_id' => $reservation_id,
+                        'email' => $reservation_email,
+                    ),
+                    array(
+                        '%s',  // The format of the id field
+                        '%s',  // The format of the email field
+                    )
+                );
+
+                // Create reservation acceptance link
+                $accept_reservation_link = add_query_arg(array(
+                    'reservation_accept' => $reservation_id,
+                ), home_url('/'));
+
+                $reservation_restaurant_email = get_option('reservation_email');
+                
+                // Check if the reservation holder has entered an email address and if not, use the default admin email address
+                if($reservation_restaurant_email == '') {
+                    $reservation_restaurant_email = get_option('admin_email');
+                }
+
+                // Send email to restaurant owner
+                $to = $reservation_restaurant_email;
+                $subject = "Nieuwe reservering bij Eetboetiek Festina Lente";
+                // Construct the email message
+                $message = "<b>Reservering details: </b>\n\n<bR>";
+                $message .= "Reservering houder: $reservation_holder_voornaam $reservation_holder_achternaam\n<bR>";
+                $message .= "E-mail: $reservation_email\n<bR>";
+                $message .= "Telefoonnummer: $reservation_phone\n<bR><br>";
+                $message .= "Aantal gasten: $reservation_guests\n<bR>";
+                if($reservation_type == 'lunch') {
+                    $message .= "Reservring type: Lunch\n<bR>";
+                } else if($reservation_type == 'high_tea') {
+                    $message .= "Reservring type: High Tea\n<bR>";
+                } else if($reservation_type == 'lente_lunch') {
+                    $message .= "Reservring type: Lentes Lunch\n<bR>";
+                } else {
+                    $message.= "Reservering type: Lentes Menu\n<bR>";
+                }
+
+                if($reservation_type == 'lunch' || $reservation_type == 'lente_lunch') {
+                    $message .= "Reservering tijd (Lunch): $reservation_time_lunch\n<bR>";
+                } else if($reservation_type == 'high_tea') {
+                    $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
+                } else if($reservation_type == 'lentes_menu') {
+                    $message .= "Reservering tijd (Lentes Menu): $reservation_time_menu\n<bR>";
+                }
+                $message .= "Reservering datum: $reservation_date\n<bR>";
+                $message .= "Opmerkingen: $special_request_text\n\n<bR><bR><br>";
+                $message .= "Klik op de volgende link om de reservering te accepteren: <a href='$accept_reservation_link'>Reservering bevestigen</a>";
+
+                $headers = array('Content-Type: text/html; charset=UTF-8');
+                wp_mail($to, $subject, $message, $headers);
+
+                // Send email to reservation holder
+                $to = $reservation_email;
+                $subject = "Bedankt voor je reservering bij Eetboetiek Festina Lente";
+                $message = "Bedankt voor je reservering bij Eetboetiek Festina Lente. Je ontvangt binnen 24 uur een bevestiging.\n\n<br><br>";
+                $message .= "Je reservering details: \n\n<bR>";
+                $message .= "Reservering houder: $reservation_holder_voornaam $reservation_holder_achternaam\n<bR>";
+                $message .= "E-mail: $reservation_email\n<bR>";
+                $message .= "Telefoonnummer: $reservation_phone\n<bR><bR>";
+                $message .= "Aantal gasten: $reservation_guests\n<bR>";
+                if($reservation_type == 'lunch') {
+                    $message .= "Reservring type: Lunch\n<bR>";
+                } else if($reservation_type == 'high_tea') {
+                    $message .= "Reservring type: High Tea\n<bR>";
+                } else if($reservation_type == 'lente_lunch') {
+                    $message .= "Reservring type: Lentes Lunch\n<bR>";
+                } else {
+                    $reservering_type = 'lentes_menu';
+                    $message.= "Reservering type: Lentes Menu\n<bR>";
+                }
+
+                if($reservation_type == 'lunch' || $reservation_type == 'lente_lunch') {
+                    $message .= "Reservering tijd (Lunch): $reservation_time_lunch\n<bR>";
+                } else if($reservation_type == 'high_tea') {
+                    $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
+                } else if($reservation_type == 'lentes_menu') {
+                    $message .= "Reservering tijd (Lentes Menu): $reservation_time_menu\n<bR>";
+                }
+                $message .= "Reservering datum: $reservation_date\n<bR>";
+                $message .= "Opmerkingen: $special_request_text\n\n<bR><bR>";
+                $headers = array('Content-Type: text/html; charset=UTF-8');
+                wp_mail($to, $subject, $message, $headers);
+
+                // Redirect to a thank you page
+                wp_redirect(esc_url(add_query_arg($query, $query_val, home_url('/bedankt-voor-je-reservering'))));
+                exit;
+            }
         }
-
-        // Send email to restaurant owner
-        $to = $reservation_restaurant_email;
-        $subject = "Nieuwe reservering bij Eetboetiek Festina Lente";
-        // Construct the email message
-        $message = "<b>Reservering details: </b>\n\n<bR>";
-        $message .= "Reservering houder: $reservation_holder_voornaam $reservation_holder_achternaam\n<bR>";
-        $message .= "E-mail: $reservation_email\n<bR>";
-        $message .= "Telefoonnummer: $reservation_phone\n<bR><br>";
-        $message .= "Aantal gasten: $reservation_guests\n<bR>";
-        if($reservation_type == 'lunch') {
-            $message .= "Reservring type: Lunch\n<bR>";
-        } else if($reservation_type == 'high_tea') {
-            $message .= "Reservring type: High Tea\n<bR>";
-        } else if($reservation_type == 'lente_lunch') {
-            $message .= "Reservring type: Lentes Lunch\n<bR>";
-        } else {
-            $message.= "Reservering type: Lentes Menu\n<bR>";
-        }
-
-        if($reservation_type == 'lunch' || $reservation_type == 'lente_lunch') {
-            $message .= "Reservering tijd (Lunch): $reservation_time_lunch\n<bR>";
-        } else if($reservation_type == 'high_tea') {
-            $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
-        } else if($reservation_type == 'lentes_menu') {
-            $message .= "Reservering tijd (Lentes Menu): $reservation_time_menu\n<bR>";
-        }
-        $message .= "Reservering datum: $reservation_date\n<bR>";
-        $message .= "Opmerkingen: $special_request_text\n\n<bR><bR><br>";
-        $message .= "Klik op de volgende link om de reservering te accepteren: <a href='$accept_reservation_link'>Reservering bevestigen</a>";
-
-        $headers = array('Content-Type: text/html; charset=UTF-8');
-        wp_mail($to, $subject, $message, $headers);
-
-        // Send email to reservation holder
-        $to = $reservation_email;
-        $subject = "Bedankt voor je reservering bij Eetboetiek Festina Lente";
-        $message = "Bedankt voor je reservering bij Eetboetiek Festina Lente. Je ontvangt binnen 24 uur een bevestiging.\n\n<br><br>";
-        $message .= "Je reservering details: \n\n<bR>";
-        $message .= "Reservering houder: $reservation_holder_voornaam $reservation_holder_achternaam\n<bR>";
-        $message .= "E-mail: $reservation_email\n<bR>";
-        $message .= "Telefoonnummer: $reservation_phone\n<bR><bR>";
-        $message .= "Aantal gasten: $reservation_guests\n<bR>";
-        if($reservation_type == 'lunch') {
-            $message .= "Reservring type: Lunch\n<bR>";
-        } else if($reservation_type == 'high_tea') {
-            $message .= "Reservring type: High Tea\n<bR>";
-        } else if($reservation_type == 'lente_lunch') {
-            $message .= "Reservring type: Lentes Lunch\n<bR>";
-        } else {
-            $reservering_type = 'lentes_menu';
-            $message.= "Reservering type: Lentes Menu\n<bR>";
-        }
-
-        if($reservation_type == 'lunch' || $reservation_type == 'lente_lunch') {
-            $message .= "Reservering tijd (Lunch): $reservation_time_lunch\n<bR>";
-        } else if($reservation_type == 'high_tea') {
-            $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
-        } else if($reservation_type == 'lentes_menu') {
-            $message .= "Reservering tijd (Lentes Menu): $reservation_time_menu\n<bR>";
-        }
-        $message .= "Reservering datum: $reservation_date\n<bR>";
-        $message .= "Opmerkingen: $special_request_text\n\n<bR><bR>";
-        $headers = array('Content-Type: text/html; charset=UTF-8');
-        wp_mail($to, $subject, $message, $headers);
-
-        // Redirect to a thank you page
-        wp_redirect(home_url('/bedankt-voor-je-reservering'));
-        exit;
     }
 
     private static function generate_random_id() {
@@ -191,18 +185,7 @@ class ReservationPlugin {
         ob_start();
 
         ?>
-        <!-- <script src="https://www.google.com/recaptcha/api.js?render=6LfdbZ4nAAAAANeMVJP3zjWNuHiBJgc4IjwBcnoR"></script>
-        <script>
-            grecaptcha.ready(function() {
-                grecaptcha.execute('6LfdbZ4nAAAAANeMVJP3zjWNuHiBJgc4IjwBcnoR', {action: 'submit'}).then(function(token) {
-                    var recaptchaInput = document.createElement('input');
-                    recaptchaInput.type = 'hidden';
-                    recaptchaInput.name = 'g-recaptcha-response';
-                    recaptchaInput.value = token;
-                    document.getElementById('reservation_form').appendChild(recaptchaInput);
-                });
-            });
-        </script> -->
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha" async defer></script>
 
         <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" id="reservation_form">
             <input type="hidden" name="action" value="submit_reservation">
@@ -294,7 +277,7 @@ class ReservationPlugin {
                         
                 <label for="special_request_text">Overige opmerkingen (zoals allergieën):</label>
                 <textarea id="special_request_text" name="special_request_text"></textarea>
-
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAAAOIKhilbmFzNmzN"></div>
                 <div class="submit-div">
                     <input type="submit" value="Reservering plaatsen">
                     <div id="loading-spinner" style="display:none; align-items: center;">
