@@ -11,7 +11,13 @@ class ReservationPlugin {
         check_admin_referer('reservation_verify');
 
         // Verify reCAPTCHA
-        $recaptcha_secret = '';
+        $recaptcha_secret = get_option('reservation_recaptche_secret');
+        if(empty($recaptcha_secret)) {
+            // sent e-mail to support@junnect.nl, include site name
+            wp_mail('support@junnect.nl', 'Recaptcha secret not set', 'Recaptcha secret not set for site: ' . get_bloginfo('name'));
+            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
+            exit;
+        }
         $recaptcha_response = sanitize_text_field($_POST['g-recaptcha-response']);
 
         $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(

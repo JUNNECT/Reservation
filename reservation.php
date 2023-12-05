@@ -127,6 +127,7 @@ add_shortcode('reservation_success', 'reservation_success_shortcode');
 // Register the "reservation_options" option
 function register_reservation_options() {
     register_setting('reservation_options', 'reservation_email');
+    register_setting('reservation_options', 'reservation_recaptche_secret')
 }
 add_action('admin_init', 'register_reservation_options');
 
@@ -143,6 +144,7 @@ function reservation_options() {
     }
 
     $email = get_option('reservation_email');
+    $recaptcha_secret = get_option('reservation_recaptche_secret');
     ?>
     <div class="wrap">
         <h1>Reservering</h1>
@@ -153,6 +155,7 @@ function reservation_options() {
                 <tr valign="top">
                     <th scope="row">Emailadres</th>
                     <td><input type="text" name="reservation_email" value="<?php echo esc_attr($email); ?>" /></td>
+                    <td><input type="password" name="reservation_recaptche_secret" value="<?= $recaptcha_secret; ?>" /> </td>
                 </tr>
             </table>
             <?php submit_button(); ?>
