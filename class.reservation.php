@@ -25,13 +25,13 @@ class ReservationPlugin {
 
         if (intval($response_keys["success"]) !== 1) {
             // reCAPTCHA verification failed
-            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha'));
+            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
             exit;
         }
 
         if ($response_keys["score"] < 0.5) {
             // reCAPTCHA v3 detected suspicious interaction
-            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha'));
+            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=suspicious'));
             exit;
         }
 
