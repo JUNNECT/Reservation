@@ -60,6 +60,13 @@ jQuery(document).ready(function() {
         // Prevent the form from submitting
         e.preventDefault();
 
+        var selectedOption = $('[name="reservation_type"]').val();
+
+        if (!selectedOption) {
+            alert("Selecteer een reserverings type.");
+            return;
+        }
+
         // Display the loading animation
         $('#loading-spinner').css('display', 'flex');
 

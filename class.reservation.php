@@ -219,15 +219,19 @@ class ReservationPlugin {
             </div>
 
             <div class="rest_of_form">
-                <?php if($name != 'lentes_menu') { ?>
                 <label for="reservation_type">Waarvoor wil je reserveren:</label>
                 <select id="reservation_type" name="reservation_type" required>
-                    <option value="none" selected disabled hidden>Selecteer een optie</option>
-                    <option value="lunch">Lunch</option>
-                    <option value="high_tea">High Tea</option>
-                    <option value="lente_lunch">Lentes Lunch</option>
+                    <?php if($name != 'lentes_menu') { ?>
+                        <option vale="" selected disabled>Selecteer een optie</option>
+                        <option value="lunch">Lunch</option>
+                        <option value="high_tea">High Tea</option>
+                        <option value="lente_lunch">Lentes Lunch</option>
+                    <?php } else { ?>
+                        <option value="lentes_menu">Lentes Menu</option>
+                    <?php } ?>
                 </select>
 
+                <?php if($name != 'lentes_menu') { ?>
                 <div class="reservation_time_lunch" style="display: none;">
                     <label for="reservation_time_lunch">Tijd:</label>
                     <select id="reservation_time_lunch" name="reservation_time_lunch">
@@ -273,7 +277,7 @@ class ReservationPlugin {
                 <?php } ?>
 
                 <label for="reservation_date">Datum:</label>
-                <input type="text" id="reservation_date<?php if($name == 'lentes_menu'): echo '_lunch'; endif; ?>" name="reservation_date" autocomplete="off" required>
+                <input type="text" id="reservation_date<?php if($name == 'lentes_menu'): echo '_menu'; endif; ?>" name="reservation_date" autocomplete="off" required>
                         
                 <label for="special_request_text">Overige opmerkingen (zoals allergieën):</label>
                 <textarea id="special_request_text" name="special_request_text"></textarea>
@@ -291,8 +295,23 @@ class ReservationPlugin {
                 <a class="form_button" href="tel:0165–857253">Direct bellen</a>
             </div>
         </form>
+        
+        <?php if($name != 'lentes_menu') { ?>
+        <script>
+            jQuery(document).ready(function($){
+                $('#reservation_form').submit(function(event){
+                    var selectedOption = $('[name="reservation_type"]').val();
+                    if (!selectedOption) {
+                    alert("Selecteer een reserverings type.");
+                    event.preventDefault();
+                    return;
+                    }
+                });
+            });
 
+        </script>
         <?php
+        }
         return ob_get_clean();
     }
 }
