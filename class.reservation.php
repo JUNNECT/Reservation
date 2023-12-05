@@ -47,17 +47,17 @@ class ReservationPlugin {
             $reservation_type = 'lentes_menu';
         }
 
-        if(isset($_POST['reservation_time_lunch'])) {
+        // if(isset($_POST['reservation_time_lunch'])) {
             $reservation_time_lunch = sanitize_text_field($_POST['reservation_time_lunch']);
-        }
+        // }
 
-        if(isset($_POST['reservation_time_high_tea'])) {
+        // if(isset($_POST['reservation_time_high_tea'])) {
             $reservation_time_high_tea = sanitize_text_field($_POST['reservation_time_high_tea']);
-        }
+        // }
 
-        if(isset($_POST['reservation_time_menu'])) {
+        // if(isset($_POST['reservation_time_menu'])) {
             $reservation_time_menu = sanitize_text_field($_POST['reservation_time_menu']);
-        }
+        // }
 
         $reservation_date = sanitize_text_field($_POST['reservation_date']);
 
@@ -109,9 +109,9 @@ class ReservationPlugin {
         } else if($reservation_type == 'high_tea') {
             $message .= "Reservring type: High Tea\n<bR>";
         } else if($reservation_type == 'lente_lunch') {
-            $message .= "Reservring type: Lente's Lunch\n<bR>";
+            $message .= "Reservring type: Lentes Lunch\n<bR>";
         } else {
-            $message.= "Reservering type: Lente's Menu\n<bR>";
+            $message.= "Reservering type: Lentes Menu\n<bR>";
         }
 
         if($reservation_type == 'lunch' || $reservation_type == 'lente_lunch') {
@@ -119,7 +119,7 @@ class ReservationPlugin {
         } else if($reservation_type == 'high_tea') {
             $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
         } else if($reservation_type == 'lentes_menu') {
-            $message .= "Reservering tijd (Lente's Menu): $reservation_time_menu\n<bR>";
+            $message .= "Reservering tijd (Lentes Menu): $reservation_time_menu\n<bR>";
         }
         $message .= "Reservering datum: $reservation_date\n<bR>";
         $message .= "Opmerkingen: $special_request_text\n\n<bR><bR><br>";
@@ -142,10 +142,10 @@ class ReservationPlugin {
         } else if($reservation_type == 'high_tea') {
             $message .= "Reservring type: High Tea\n<bR>";
         } else if($reservation_type == 'lente_lunch') {
-            $message .= "Reservring type: Lente's Lunch\n<bR>";
+            $message .= "Reservring type: Lentes Lunch\n<bR>";
         } else {
             $reservering_type = 'lentes_menu';
-            $message.= "Reservering type: Lente's Menu\n<bR>";
+            $message.= "Reservering type: Lentes Menu\n<bR>";
         }
 
         if($reservation_type == 'lunch' || $reservation_type == 'lente_lunch') {
@@ -153,7 +153,7 @@ class ReservationPlugin {
         } else if($reservation_type == 'high_tea') {
             $message .= "Reservering tijd (High Tea): $reservation_time_high_tea\n<bR>";
         } else if($reservation_type == 'lentes_menu') {
-            $message .= "Reservering tijd (Lente's Menu): $reservation_time_menu\n<bR>";
+            $message .= "Reservering tijd (Lentes Menu): $reservation_time_menu\n<bR>";
         }
         $message .= "Reservering datum: $reservation_date\n<bR>";
         $message .= "Opmerkingen: $special_request_text\n\n<bR><bR>";
@@ -236,7 +236,7 @@ class ReservationPlugin {
                     <option value="none" selected disabled hidden>Selecteer een optie</option>
                     <option value="lunch">Lunch</option>
                     <option value="high_tea">High Tea</option>
-                    <option value="lente_lunch">Lente's Lunch</option>
+                    <option value="lente_lunch">Lentes Lunch</option>
                 </select>
 
                 <div class="reservation_time_lunch" style="display: none;">
