@@ -155,6 +155,7 @@ function reservation_options() {
                 <tr valign="top">
                     <th scope="row">Emailadres</th>
                     <td><input type="text" name="reservation_email" value="<?php echo esc_attr($email); ?>" /></td>
+                    <th scope="row">Recaptcha secret</th>
                     <td><input type="password" name="reservation_recaptche_secret" value="<?= $recaptcha_secret; ?>" /> </td>
                 </tr>
             </table>
