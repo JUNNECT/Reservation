@@ -11,35 +11,35 @@ class ReservationPlugin {
         check_admin_referer('reservation_verify');
 
         // Verify reCAPTCHA
-        $recaptcha_secret = get_option('reservation_recaptche_secret');
-        if(empty($recaptcha_secret)) {
-            // sent e-mail to support@junnect.nl, include site name
-            wp_mail('support@junnect.nl', 'Recaptcha secret not set', 'Recaptcha secret not set for site: ' . get_bloginfo('name'));
-            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
-            exit;
-        }
-        $recaptcha_response = sanitize_text_field($_POST['g-recaptcha-response']);
+        // $recaptcha_secret = get_option('reservation_recaptche_secret');
+        // if(empty($recaptcha_secret)) {
+        //     // sent e-mail to support@junnect.nl, include site name
+        //     wp_mail('support@junnect.nl', 'Recaptcha secret not set', 'Recaptcha secret not set for site: ' . get_bloginfo('name'));
+        //     wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
+        //     exit;
+        // }
+        // $recaptcha_response = sanitize_text_field($_POST['g-recaptcha-response']);
 
-        $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(
-            'body' => array(
-                'secret' => $recaptcha_secret,
-                'response' => $recaptcha_response,
-            )
-        ));
+        // $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(
+        //     'body' => array(
+        //         'secret' => $recaptcha_secret,
+        //         'response' => $recaptcha_response,
+        //     )
+        // ));
 
-        $response_keys = json_decode(wp_remote_retrieve_body($response), true);
+        // $response_keys = json_decode(wp_remote_retrieve_body($response), true);
 
-        if (intval($response_keys["success"]) !== 1) {
-            // reCAPTCHA verification failed
-            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
-            exit;
-        }
+        // if (intval($response_keys["success"]) !== 1) {
+        //     // reCAPTCHA verification failed
+        //     wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=failed'));
+        //     exit;
+        // }
 
-        if ($response_keys["score"] < 0.5) {
-            // reCAPTCHA v3 detected suspicious interaction
-            wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=suspicious'));
-            exit;
-        }
+        // if ($response_keys["score"] < 0.5) {
+        //     // reCAPTCHA v3 detected suspicious interaction
+        //     wp_redirect(home_url('/reservering_geaccepteerd/?success=recaptcha&error=suspicious'));
+        //     exit;
+        // }
 
         // Process form data and send email
         $reservation_holder_voornaam = sanitize_text_field($_POST['reservation_holder_voornaam']);
@@ -191,7 +191,7 @@ class ReservationPlugin {
         ob_start();
 
         ?>
-        <script src="https://www.google.com/recaptcha/api.js?render=6LfdbZ4nAAAAANeMVJP3zjWNuHiBJgc4IjwBcnoR"></script>
+        <!-- <script src="https://www.google.com/recaptcha/api.js?render=6LfdbZ4nAAAAANeMVJP3zjWNuHiBJgc4IjwBcnoR"></script>
         <script>
             grecaptcha.ready(function() {
                 grecaptcha.execute('6LfdbZ4nAAAAANeMVJP3zjWNuHiBJgc4IjwBcnoR', {action: 'submit'}).then(function(token) {
@@ -202,7 +202,7 @@ class ReservationPlugin {
                     document.getElementById('reservation_form').appendChild(recaptchaInput);
                 });
             });
-        </script>
+        </script> -->
 
         <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" id="reservation_form">
             <input type="hidden" name="action" value="submit_reservation">
